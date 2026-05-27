@@ -12,6 +12,7 @@ import { Suspense } from "react";
 import ColorButton from "./_components/color-button";
 import { cn } from "@/lib/utils";
 import { Cpu, Server } from "lucide-react";
+import ShareButton from "./_components/share-button";
 
 type PhoneWithColors = Tables<"phones"> & {
   phone_colors: Tables<"phone_colors">[];
@@ -96,7 +97,7 @@ async function PhonesContent({ searchParams }: { searchParams: PageSearchParams 
 
   return (
     <div className="container flex flex-col md:items-center md:w-[720px]">
-      <div className="grid grid-cols-2 w-full gap-4 md:gap-24 mt-4 mb-8">
+      <div className="grid grid-cols-2 w-full gap-4 md:gap-24 mt-4 mb-4">
         <PhoneCard
           order="primary"
           phones={data}
@@ -110,6 +111,7 @@ async function PhonesContent({ searchParams }: { searchParams: PageSearchParams 
           selectedColor={selectedSecondaryColor}
         />
       </div>
+      <ShareButton className="self-end mb-6">공유하기</ShareButton>
       <Accordion type="single" collapsible className="w-full md:w-[480px] mb-24">
         <AccordionItem value="item-1">
           <AccordionTrigger>요약</AccordionTrigger>
