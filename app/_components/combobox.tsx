@@ -13,67 +13,41 @@ import {
   ComboboxValue,
 } from "@/components/ui/combobox";
 import { cn } from "@/lib/utils";
+import { useRouter, useSearchParams } from "next/navigation";
 
-const countries = [
-  { code: "", value: "", continent: "", label: "Select country" },
-  {
-    code: "ar",
-    value: "argentina",
-    label: "Argentina",
-    continent: "South America",
-  },
-  { code: "au", value: "australia", label: "Australia", continent: "Oceania" },
-  { code: "br", value: "brazil", label: "Brazil", continent: "South America" },
-  { code: "ca", value: "canada", label: "Canada", continent: "North America" },
-  { code: "cn", value: "china", label: "China", continent: "Asia" },
-  {
-    code: "co",
-    value: "colombia",
-    label: "Colombia",
-    continent: "South America",
-  },
-  { code: "eg", value: "egypt", label: "Egypt", continent: "Africa" },
-  { code: "fr", value: "france", label: "France", continent: "Europe" },
-  { code: "de", value: "germany", label: "Germany", continent: "Europe" },
-  { code: "it", value: "italy", label: "Italy", continent: "Europe" },
-  { code: "jp", value: "japan", label: "Japan", continent: "Asia" },
-  { code: "ke", value: "kenya", label: "Kenya", continent: "Africa" },
-  { code: "mx", value: "mexico", label: "Mexico", continent: "North America" },
-  {
-    code: "nz",
-    value: "new-zealand",
-    label: "New Zealand",
-    continent: "Oceania",
-  },
-  { code: "ng", value: "nigeria", label: "Nigeria", continent: "Africa" },
-  {
-    code: "za",
-    value: "south-africa",
-    label: "South Africa",
-    continent: "Africa",
-  },
-  { code: "kr", value: "south-korea", label: "South Korea", continent: "Asia" },
-  {
-    code: "gb",
-    value: "united-kingdom",
-    label: "United Kingdom",
-    continent: "Europe",
-  },
-  {
-    code: "us",
-    value: "united-states",
-    label: "United States",
-    continent: "North America",
-  },
-];
+type PhoneOption = { value: string; label: string };
 
-export function PhoneCombobox({ className }: { className?: string }) {
+export function PhoneCombobox({
+  className,
+  order,
+  options,
+  selectedValue,
+}: {
+  className?: string;
+  order: "primary" | "secondary";
+  options: PhoneOption[];
+  selectedValue: string;
+}) {
+  const router = useRouter();
+  const searchParams = useSearchParams();
+
+  const defaultItem = options.find((item) => item.value === selectedValue) ?? options[0];
+
   return (
     <div className={cn("w-full", className)}>
-      <Combobox items={countries} defaultValue={countries[0]}>
+      <Combobox
+        items={options}
+        value={defaultItem}
+        onValueChange={(currentValue: PhoneOption | null) => {
+          const newSearchParams = new URLSearchParams(searchParams.toString());
+          if (currentValue?.value) newSearchParams.set(order, currentValue.value);
+          else newSearchParams.delete(order);
+          router.push(`?${newSearchParams.toString()}`);
+        }}
+      >
         <ComboboxTrigger
           render={
-            <Button variant="outline" className="w-64 justify-between font-normal">
+            <Button variant="outline" className="w-full justify-between font-normal">
               <ComboboxValue />
               <ChevronDownIcon className="pointer-events-none size-4 shrink-0 text-muted-foreground" />
             </Button>
@@ -84,7 +58,7 @@ export function PhoneCombobox({ className }: { className?: string }) {
           <ComboboxEmpty>No items found.</ComboboxEmpty>
           <ComboboxList>
             {(item) => (
-              <ComboboxItem key={item.code} value={item}>
+              <ComboboxItem key={item.value || item.label} value={item}>
                 {item.label}
               </ComboboxItem>
             )}
