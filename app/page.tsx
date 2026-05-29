@@ -13,6 +13,7 @@ import ColorButton from "./_components/color-button";
 import { cn } from "@/lib/utils";
 import { Cpu, Server } from "lucide-react";
 import ShareButton from "./_components/share-button";
+import PhoneCardSkeleton from "./_components/phone-card-skeleton";
 
 type PhoneWithColors = Tables<"phones"> & {
   phone_colors: Tables<"phone_colors">[];
@@ -55,7 +56,7 @@ const PhoneCard = ({
           src={`/phones/${selectedPhone.name}-${selectedColor}.png`}
           alt="i14 beige"
           fill
-          sizes={"50vw"}
+          sizes={"(max-width: 768px) 50vw, 33vw"}
           className="object-contain"
           priority
         />
@@ -98,18 +99,22 @@ async function PhonesContent({ searchParams }: { searchParams: PageSearchParams 
   return (
     <div className="container flex flex-col md:items-center md:w-[720px]">
       <div className="grid grid-cols-2 w-full gap-4 md:gap-24 mt-4 mb-4">
-        <PhoneCard
-          order="primary"
-          phones={data}
-          selectedPhoneName={primaryPhone.name}
-          selectedColor={selectedPrimaryColor}
-        />
-        <PhoneCard
-          order="secondary"
-          phones={data}
-          selectedPhoneName={secondaryPhone.name}
-          selectedColor={selectedSecondaryColor}
-        />
+        <Suspense fallback={<PhoneCardSkeleton />}>
+          <PhoneCard
+            order="primary"
+            phones={data}
+            selectedPhoneName={primaryPhone.name}
+            selectedColor={selectedPrimaryColor}
+          />
+        </Suspense>
+        <Suspense fallback={<PhoneCardSkeleton />}>
+          <PhoneCard
+            order="secondary"
+            phones={data}
+            selectedPhoneName={secondaryPhone.name}
+            selectedColor={selectedSecondaryColor}
+          />
+        </Suspense>
       </div>
       <ShareButton className="self-end mb-6">공유하기</ShareButton>
       <Accordion type="single" collapsible className="w-full md:w-[480px] mb-24">
