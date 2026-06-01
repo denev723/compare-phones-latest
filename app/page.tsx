@@ -108,7 +108,7 @@ const PhoneCard = ({
           />
         ))}
       </div>
-      <div className="text-xl font-semibold">베이지</div>
+      <div className="text-xl font-semibold">{selectedColor}</div>
     </div>
   );
 };
