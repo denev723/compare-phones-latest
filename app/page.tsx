@@ -14,10 +14,47 @@ import { cn } from "@/lib/utils";
 import { Cpu, Server } from "lucide-react";
 import ShareButton from "./_components/share-button";
 import PhoneCardSkeleton from "./_components/phone-card-skeleton";
+// import { Metadata } from "next";
 
 type PhoneWithColors = Tables<"phones"> & {
   phone_colors: Tables<"phone_colors">[];
 };
+
+type PageSearchParams = Promise<{
+  primary?: string;
+  secondary?: string;
+  primaryColor?: string;
+  secondaryColor?: string;
+}>;
+
+// export const metadata: Metadata = {
+//   title: "I-Phone 비교하기",
+//   description: "I-Phone을 비교해 보세요.",
+//   twitter: {
+//     title: "I-Phone 비교하기",
+//     description: "I-Phone을 비교해 보세요.",
+//   },
+// };
+
+export async function generateMetadata({ searchParams }: { searchParams: PageSearchParams }) {
+  const { primary, secondary, primaryColor, secondaryColor } = await searchParams;
+
+  const supabase = await createClient();
+  const { data } = await supabase.from("phones").select("*, phone_colors(*)");
+
+  if (!data) throw new Error("No data");
+
+  const primaryPhone = data.find((phone) => phone.name === primary) || data[0];
+  const secondaryPhone = data.find((phone) => phone.name === secondary) || data[0];
+
+  const resolvedPrimaryColor = primaryColor || primaryPhone.phone_colors[0].name;
+  const resolvedSecondaryColor = secondaryColor || secondaryPhone.phone_colors[0].name;
+
+  return {
+    title: `${primaryPhone.name} ${resolvedPrimaryColor}모델과 ${secondaryPhone.name} ${resolvedSecondaryColor} 모델을 비교해 보세요.`,
+    description: `${primaryPhone.name}와 ${secondaryPhone.name}을 스마트폰 정보를 비교해 보세요.`,
+  };
+}
 
 const PhoneCard = ({
   order,
@@ -75,13 +112,6 @@ const PhoneCard = ({
     </div>
   );
 };
-
-type PageSearchParams = Promise<{
-  primary?: string;
-  secondary?: string;
-  primaryColor?: string;
-  secondaryColor?: string;
-}>;
 
 async function PhonesContent({ searchParams }: { searchParams: PageSearchParams }) {
   const { primary, secondary, primaryColor, secondaryColor } = await searchParams;
